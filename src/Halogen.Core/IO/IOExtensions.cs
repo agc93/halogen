@@ -7,11 +7,9 @@ namespace Halogen.Core.IO
     {
         internal static byte[] ReadBytes(this IFile file) {
             var stream = file.OpenRead();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                stream.CopyTo(ms);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            return ms.ToArray();
         }
     }
 }

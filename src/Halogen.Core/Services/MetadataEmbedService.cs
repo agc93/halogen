@@ -17,19 +17,20 @@ namespace Halogen.Core.Services
             
         }
 
-        public MetadataEmbedService(IFileSystem _fileSystem)
+        public MetadataEmbedService(IFileSystem fileSystem)
         {
+            fileSystem = fileSystem;
         }
 
-        public MetadataEmbedService(IFileSystem _fileSystem, IFileAccessProvider _fileProvider)
-        {
-            
-        }
+        // public MetadataEmbedService(IFileSystem _fileSystem, IFileAccessProvider _fileProvider)
+        // {
+        //     
+        // }
         public HalogenId InitializeFile(string filePath) {
             // var mTime = new FileInfo(filePath).LastWriteTime;
             // var tfile = TagLib.File.Create(filePath);
             var path = new FilePath(filePath);
-            if ((GetMetadata(path, v => v.Tag.RemixedBy, out var existingField))) {
+            if (GetMetadata(path, v => v.Tag.RemixedBy, out var existingField)) {
                 return existingField.Split(Halogen.Constants.KeyValueDelimiter).Last();
             }
             var fileId = HalogenId.Create(new System.IO.FileInfo(filePath), _fileSystem);
@@ -41,7 +42,7 @@ namespace Halogen.Core.Services
         }
 
         public (string, string) EmbedKey(string filePath, string key, string value = null) {
-            value = value ?? string.Empty;
+            value ??= string.Empty;
             ModifyMetadata(new FilePath(filePath), f => f.AddTag(key, value));
             return (key, value);
         }
@@ -68,7 +69,7 @@ namespace Halogen.Core.Services
         public virtual void EmbedMetadata(Video video, string videoPath) {
             var finalFile = ModifyMetadata(new FilePath(videoPath), f => f.Tag.Conductor = video.Data);
             finalFile = ModifyMetadata(finalFile, f => f.Tag.Title = video.Title);
-            finalFile = ModifyMetadata(finalFile, f => f.Tag.Composers = video.Tags.ToArray());
+            finalFile = ModifyMetadata(finalFile, f => f.Tag.Composers = video.Tags.ToStringList().ToArray());
         }
 
         public virtual Video ExtractMetadata(string videoPath) {
@@ -84,7 +85,7 @@ namespace Halogen.Core.Services
                 Id = HalogenId.Parse(meta[0]),
                 Title = meta[1],
                 Data = meta[2],
-                Tags = tags
+                Tags = new TagSet(tags)
             };
         }
 
@@ -102,35 +103,25 @@ namespace Halogen.Core.Services
 
         private T GetMetadata<T>(FilePath filePath, Func<TagLib.File, T> fileAction) {
             var mTime = _fileSystem.GetFile(filePath).LastWriteTime;
-            using (var tFile = TagLib.File.Create(filePath.FullPath))
-            {
-                var result = fileAction.Invoke(tFile);
-                return result;
-            }
+            using var tFile = TagLib.File.Create(filePath.FullPath);
+            var result = fileAction.Invoke(tFile);
+            return result;
         }
 
         private bool GetMetadata<T>(FilePath filePath, Func<TagLib.File, T> fileAction, out T result) {
             var inFile = GetMetadata(filePath, fileAction);
             result = inFile;
-            return result != null && (result.GetType() == typeof(string) ? !string.IsNullOrWhiteSpace(inFile.ToString()) : true);
+            return result != null && (!(result is string) || !string.IsNullOrWhiteSpace(inFile.ToString()));
         }
 
         private IEnumerable<T> GetMetadataSet<T>(FilePath filePath, IEnumerable<Func<TagLib.File, T>> fileActions) {
             var mTime = _fileSystem.GetFile(filePath).LastWriteTime;
-            using (var tFile = TagLib.File.Create(filePath.FullPath))
+            using var tFile = TagLib.File.Create(filePath.FullPath);
+            foreach (var action in fileActions)
             {
-                foreach (var action in fileActions)
-                {
-                    var result = action.Invoke(tFile);
-                    yield return result;
-                }
+                var result = action.Invoke(tFile);
+                yield return result;
             }
-        }
-    }
-    internal static class TagFileExtensions {
-        internal static TagLib.File AddTag(this TagLib.File file, string key, string value) {
-            file.Tag.Conductor = $"{file.Tag.Conductor}{Constants.KeyDelimiter}{key}{Constants.KeyValueDelimiter}{value}";
-            return file;
         }
     }
 }

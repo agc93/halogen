@@ -18,14 +18,16 @@ namespace Halogen.Console
             var service = new MetadataEmbedService() {
                 // FileProvider = new DefaultFileAccessProvider()
             };
+            var ct = new Video<List<string>>();
             var extracted = service.ExtractMetadata(targetFilePath);
-            var data = extracted.GetData<List<string>>();
+            var data = extracted.GetData();
+            var vd = new Video();
             var current = service.GetVideoTitle(targetFilePath);
             var embedId = service.InitializeFile(targetFilePath);
             var vid = new Video {
                 Id = embedId,
                 Title = "HalogenTest",
-                Tags = new List<string> {"tag=value", "key:value"}
+                Tags = new TagSet {["tag"] = "value", ["key"] = "value"},
             };
             vid.SaveData(new List<string> {"test", "values", "here"});
             service.EmbedMetadata(vid, targetFilePath);

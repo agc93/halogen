@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Halogen.Core.IO
 {
 
+    [Obsolete]
     public class DefaultFileAccessProvider : IFileAccessProvider
     {
         public byte[] ReadBytes(FileInfo file)

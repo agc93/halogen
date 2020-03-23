@@ -8,9 +8,9 @@ namespace Halogen.Core
 {
     public class HalogenId {
 
-        public static HalogenId Create(FileInfo file) {
-            return Create(file, new DefaultFileAccessProvider());
-        }
+        // public static HalogenId Create(FileInfo file) {
+        //     return Create(file, new DefaultFileAccessProvider());
+        // }
 
         public static HalogenId Create(FileInfo file, Spectre.System.IO.IFileSystem fileSystem) {
             // if (provider == null) throw new ArgumentNullException(nameof(provider), "No IFileAccessProvider implementation provided!");

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$USER_HOME$/.Rider2019.3/system/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/.Rider2019.3/system/resharper-host/local/Transient/ReSharperHost/v193/SolutionCaches/_Halogen.1539434200.00" t="ExcludeRecursive" />
+    <e p="$PROJECT_DIR$" t="IncludeFlat">
+      <e p="Halogen.Console" t="IncludeRecursive">
+        <e p=".gitignore" t="Include" />
+        <e p="Halogen.Console.csproj" t="IncludeRecursive" />
+        <e p="Program.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="Halogen.Console.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Halogen.Core" t="IncludeRecursive">
+        <e p="BasicCollection.cs" t="Include" />
+        <e p="Constants.cs" t="Include" />
+        <e p="CoreExtensions.cs" t="Include" />
+        <e p="Diagnostics" t="Include">
+          <e p="HalogenException.cs" t="Include" />
+        </e>
+        <e p="GuidUtility.cs" t="Include" />
+        <e p="Halogen.Core.csproj" t="IncludeRecursive" />
+        <e p="HalogenClient.cs" t="Include" />
+        <e p="HalogenId.cs" t="Include" />
+        <e p="ICollection.cs" t="Include" />
+        <e p="IDataStore.cs" t="Include" />
+        <e p="IO" t="Include">
+          <e p="DefaultFileAccessProvider.cs" t="Include" />
+          <e p="IFileAccessProvider.cs" t="Include" />
+          <e p="IOExtensions.cs" t="Include" />
+        </e>
+        <e p="Services" t="Include">
+          <e p="MetadataEmbedService.cs" t="Include" />
+          <e p="TagFileExtensions.cs" t="Include" />
+        </e>
+        <e p="TagSet.cs" t="Include" />
+        <e p="Video.cs" t="Include" />
+        <e p="VideoFile.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.1" t="Include">
+              <e p="Halogen.Core.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Halogen.LiteDB" t="IncludeRecursive">
+        <e p="Halogen.LiteDB.csproj" t="IncludeRecursive" />
+        <e p="LiteDBStore.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.1" t="Include">
+              <e p="Halogen.LiteDB.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Halogen.sln" t="IncludeFlat" />
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>
