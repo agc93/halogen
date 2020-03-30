@@ -10,7 +10,7 @@ namespace Halogen.Core.Services
 {
     public class MetadataEmbedService
     {
-        private IFileSystem _fileSystem {get;set;}
+        public IFileSystem FileSystem { get; } = new FileSystem();
         // public IFileAccessProvider FileProvider {get;set;}
         public MetadataEmbedService()
         {
@@ -19,7 +19,19 @@ namespace Halogen.Core.Services
 
         public MetadataEmbedService(IFileSystem fileSystem)
         {
-            fileSystem = fileSystem;
+            fileSystem ??= new FileSystem();
+        }
+
+        public bool HasMetadata(string filePath)
+        {
+            var path = new FilePath(filePath);
+            return GetMetadata(path, v => v.Tag.RemixedBy != null && v.Tag.RemixedBy.Contains(("x-halid")));
+        }
+
+        public HalogenId GetId(string filePath)
+        {
+            var path = new FilePath(filePath);
+            return GetMetadata(path, v => v.Tag.RemixedBy.Split(Halogen.Constants.KeyDelimiter).LastOrDefault());
         }
 
         // public MetadataEmbedService(IFileSystem _fileSystem, IFileAccessProvider _fileProvider)
@@ -33,7 +45,7 @@ namespace Halogen.Core.Services
             if (GetMetadata(path, v => v.Tag.RemixedBy, out var existingField)) {
                 return existingField.Split(Halogen.Constants.KeyValueDelimiter).Last();
             }
-            var fileId = HalogenId.Create(new System.IO.FileInfo(filePath), _fileSystem);
+            var fileId = HalogenId.Create(new System.IO.FileInfo(filePath), FileSystem);
             ModifyMetadata(path, f => f.Tag.RemixedBy = $"x-halid{Halogen.Constants.KeyValueDelimiter}{fileId}");
             // tfile.Tag.Conductor = $"x-halid|{fileId}";
             // tfile.Save();
@@ -90,8 +102,8 @@ namespace Halogen.Core.Services
         }
 
         private FilePath ModifyMetadata(FilePath filePath, Action<TagLib.File> fileAction) {
-            var file = _fileSystem.GetFile(filePath);
-            var mTime = file.LastWriteTime;
+            //var file = FileSystem.GetFile(filePath);
+            //var mTime = file.LastWriteTime;
             using (var tFile = TagLib.File.Create(filePath.FullPath))
             {
                 fileAction.Invoke(tFile);
@@ -102,7 +114,7 @@ namespace Halogen.Core.Services
         }
 
         private T GetMetadata<T>(FilePath filePath, Func<TagLib.File, T> fileAction) {
-            var mTime = _fileSystem.GetFile(filePath).LastWriteTime;
+            var mTime = FileSystem.GetFile(filePath).LastWriteTime;
             using var tFile = TagLib.File.Create(filePath.FullPath);
             var result = fileAction.Invoke(tFile);
             return result;
@@ -115,7 +127,7 @@ namespace Halogen.Core.Services
         }
 
         private IEnumerable<T> GetMetadataSet<T>(FilePath filePath, IEnumerable<Func<TagLib.File, T>> fileActions) {
-            var mTime = _fileSystem.GetFile(filePath).LastWriteTime;
+            var mTime = FileSystem.GetFile(filePath).LastWriteTime;
             using var tFile = TagLib.File.Create(filePath.FullPath);
             foreach (var action in fileActions)
             {

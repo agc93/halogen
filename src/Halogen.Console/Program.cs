@@ -4,6 +4,9 @@ using System.Linq;
 using Halogen.Core;
 using Halogen.Core.IO;
 using Halogen.Core.Services;
+using Halogen.LiteDB;
+using Halon;
+using Spectre.System.IO;
 
 namespace Halogen.Console
 {
@@ -14,6 +17,12 @@ namespace Halogen.Console
             // var targetFilePath = args.First();
             var targetFilePath = System.IO.Path.Combine(Environment.CurrentDirectory, "show2.mp4");
             // var id = HalogenId.Create(new System.IO.FileInfo(targetFilePath));
+
+            var client = new HalonClientBuilder()
+                .UseDataStore<VideoFile, LiteDBStore<VideoFile>>()
+                .UseFileSystem<FileSystem>()
+                .Build("/home/achapman/Videos/Terminator");
+            var idx = client.BuildIndex();
             
             var service = new MetadataEmbedService() {
                 // FileProvider = new DefaultFileAccessProvider()

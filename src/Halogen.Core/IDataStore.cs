@@ -4,16 +4,17 @@ using System.Threading.Tasks;
 
 namespace Halogen.Core
 {
-    public interface IDataStore
+    public interface IDataStore<T> where T : VideoFile
     {
+        Task<IEnumerable<HalogenId>> AddVideos(params VideoFile[] videos);
          Task<IEnumerable<ICollection>> GetCollections(string pattern = null);
-         Task<IEnumerable<Video>> GetVideosForCollection(System.Guid collectionId);
-         Task<IEnumerable<Video>> GetVideos(Func<IEnumerable<Video>, IEnumerable<Video>> filter = null);
+         Task<IEnumerable<T>> GetVideosForCollection(System.Guid collectionId);
+         Task<IEnumerable<T>> GetVideos(Func<IEnumerable<T>, IEnumerable<T>> filter = null);
          Task<ICollection> AddCollection(string name, string shortName = null, IEnumerable<HalogenId> videos = null);
          Task<ICollection> AddVideoToCollection(HalogenId id, ICollection collection);
          Task<ICollection> RemoveVideoFromCollection(HalogenId id, ICollection collection);
          Task<ICollection> UpdateCollection(ICollection collection);
-         Task<Video> UpdateVideo(Video video);
+         Task<T> UpdateVideo(T video);
     }
 
     public interface IBackingStore {

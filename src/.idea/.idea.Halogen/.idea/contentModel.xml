@@ -52,8 +52,10 @@
         </e>
       </e>
       <e p="Halogen.LiteDB" t="IncludeRecursive">
+        <e p="DbExtensions.cs" t="Include" />
         <e p="Halogen.LiteDB.csproj" t="IncludeRecursive" />
         <e p="LiteDBStore.cs" t="Include" />
+        <e p="VideoRecord.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
@@ -64,6 +66,21 @@
         </e>
       </e>
       <e p="Halogen.sln" t="IncludeFlat" />
+      <e p="Halon" t="IncludeRecursive">
+        <e p="CoreExtensions.cs" t="Include" />
+        <e p="Halon.csproj" t="IncludeRecursive" />
+        <e p="HalonClient.cs" t="Include" />
+        <e p="HalonClientBuilder.cs" t="Include" />
+        <e p="InMemoryDataStore.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.1" t="Include">
+              <e p="Halon.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
       <e p="packages" t="ExcludeRecursive" />
     </e>
   </component>

@@ -8,7 +8,7 @@ using LiteDB;
 
 namespace Halogen.LiteDB
 {
-    public class LiteDBStore : IDataStore, IBackingStore
+    public class LiteDBStore<T> : IDataStore<T>, IBackingStore where T : VideoFile
     {
         public LiteDBStore()
         {
@@ -24,9 +24,16 @@ namespace Halogen.LiteDB
             BsonMapper.Global.Entity<VideoFile>().Id(x => x.VideoId);
         }
         private LiteDatabase GetDatabase(bool local = false) {
-            (var dbPath, var localPath) = GetPaths();
+            var (dbPath, localPath) = GetPaths();
             var db = new LiteDatabase(local ? localPath : dbPath);
             return db;
+        }
+
+        public Task<IEnumerable<T>> GetVideos(Func<IEnumerable<T>, IEnumerable<T>> filter = null)
+        {
+            using var db = GetDatabase();
+            var collections = db.GetCollection<T>("videos");
+            return Task.FromResult(collections.FindAll());
         }
 
         public Task<ICollection> AddCollection(string name, string shortName = null, IEnumerable<HalogenId> videos = null)
@@ -53,6 +60,20 @@ namespace Halogen.LiteDB
             }
         }
 
+        public Task<IEnumerable<HalogenId>> AddVideos(params VideoFile[] videos)
+        {
+            using var db = GetDatabase();
+            var index = db.GetCollection<VideoFile>("videos");
+            // var results = new List<HalogenId>();
+            var results = videos.Where(v => index.Upsert(v)).Select(r => r.VideoId);
+            // foreach (var video in videos)
+            // {
+            //     // var inserted = index.Upsert(video);
+            //     // if (inserted) results.Add();
+            // }
+            return Task.FromResult(results);
+        }
+
         public Task<IEnumerable<ICollection>> GetCollections(string pattern = null)
         {
             using (var db = GetDatabase())
@@ -63,26 +84,13 @@ namespace Halogen.LiteDB
             }
         }
 
-        public Task<IEnumerable<Video>> GetVideos(Func<IEnumerable<Video>, IEnumerable<Video>> filter = null)
+        public async Task<IEnumerable<T>> GetVideosForCollection(Guid collectionId)
         {
-            using (var db = GetDatabase())
-            {
-                var collections = db.GetCollection<Video>("videos");
-                return Task.FromResult(collections.FindAll());
-            }
-        }
-
-        public Task<IEnumerable<Video>> GetVideosForCollection(Guid collectionId)
-        {
-            using (var db = GetDatabase())
-            {
-                var collections = db.GetCollection<ICollection>("collections").FindAll();
-                var videos = db.GetCollection<Video>("vidoes").FindAll();
-                return Task.FromResult(videos.Select(v => {
-                    v.CollectionName = collections.FirstOrDefault(c => c.Videos.Contains(v.Id))?.Name;
-                    return v;
-                }));
-            }
+            using var db = GetDatabase();
+            var collections = db.GetCollection<ICollection>("collections").FindAll();
+            var collection = collections.FirstOrDefault(c => c.Id == collectionId);
+            var videos = db.GetCollection<T>("videos").FindAll();
+            return videos.Where(v => collection.Videos.Contains(v.VideoId));
         }
 
         public Task<ICollection> RemoveVideoFromCollection(HalogenId id, ICollection collection)
@@ -91,7 +99,7 @@ namespace Halogen.LiteDB
             {
                 var collections = db.GetCollection<ICollection>("collections");
                 var match = collections.FindById(collection.Id);
-                var changed = match.Videos.RemoveIfPresent(id);
+                var changed = match.Videos.Remove(id);
                 if (changed) {
                     collections.Update(match);
                 }
@@ -109,16 +117,13 @@ namespace Halogen.LiteDB
             }
         }
 
-        public Task<Video> UpdateVideo(Video video)
+        public Task<T> UpdateVideo(T video)
         {
-            using (var db = GetDatabase())
-            {
-                var collections = db.GetCollection<Video>("videos");
-                collections.Upsert(video);
-                return collections.FindById(video.Id.ToString()).ToResult();
-            }
+            using var db = GetDatabase();
+            var collections = db.GetCollection<T>("videos");
+            collections.Upsert(video);
+            return collections.FindById(video.VideoId.ToString()).ToResult();
         }
-
 #region Backing Store
         public string RootPath {get;set;}
         private string DatabaseName {get;set;}
@@ -178,15 +183,5 @@ namespace Halogen.LiteDB
             return Task.FromResult(false);
         }
 #endregion
-    }
-
-    internal static class DbExtensions {
-        internal static bool RemoveIfPresent<T>(this List<T> list, T target) {
-            return list.Contains(target) ? list.Remove(target) : false;
-        }
-
-        internal static Task<T> ToResult<T>(this T o) {
-            return Task.FromResult(o);
-        }
     }
 }

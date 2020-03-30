@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Halogen.Core\Halogen.Core.csproj" />
+    <ProjectReference Include="..\Halon\Halon.csproj" />
+    <ProjectReference Include="..\Halogen.LiteDB\Halogen.LiteDB.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
